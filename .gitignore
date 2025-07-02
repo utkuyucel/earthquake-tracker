@@ -4,4 +4,12 @@ venv/
 *_venv/
 
 
+# files 
+*.csv
+*.json
+
+# caches
+__pycache__/
+.mypy_cache/
+
 
