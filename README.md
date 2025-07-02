@@ -21,7 +21,7 @@ pip install -e ".[dev]"
 ## Files
 
 - `config.py` - Configuration settings
-- `earthquake_scraper.py` - Main scraper code  
+- `scraper.py` - Main scraper code  
 - `run_scraper.py` - Simple runner script
 - `pyproject.toml` - Project configuration and dependencies
 - `data/earthquakes.csv` - Output data

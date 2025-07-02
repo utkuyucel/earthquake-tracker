@@ -44,7 +44,7 @@ ignore = []
 unfixable = ["F401"]  # Don't auto-remove unused imports
 
 [tool.ruff.lint.isort]
-known-first-party = ["earthquake_scraper", "config"]
+known-first-party = ["scraper", "config"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]

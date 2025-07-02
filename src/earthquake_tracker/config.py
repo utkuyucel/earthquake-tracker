@@ -37,7 +37,7 @@ class LoggingConfig:
 
     log_level: str = "INFO"
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    log_file: Optional[str] = "earthquake_scraper.log"
+    log_file: Optional[str] = "scraper.log"
 
 
 # Application configuration instances
