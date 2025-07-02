@@ -8,17 +8,32 @@ Simple Python script to scrape earthquake data from KOERI website and save as CS
 python run_scraper.py
 ```
 
+## Installation
+
+```bash
+# Install dependencies
+pip install -e .
+
+# Install with development tools (with linting tools)
+pip install -e ".[dev]"
+```
+
 ## Files
 
 - `config.py` - Configuration settings
 - `earthquake_scraper.py` - Main scraper code  
 - `run_scraper.py` - Simple runner script
+- `pyproject.toml` - Project configuration and dependencies
 - `data/earthquakes.csv` - Output data
 
-## Requirements
+## Development
 
 ```bash
-pip install -r requirements.txt
+# Install with dev dependencies
+pip install -e ".[dev]"
+
+# Run linting and formatting
+./lint.sh
 ```
 
 ## Example
