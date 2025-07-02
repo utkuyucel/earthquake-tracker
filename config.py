@@ -1,11 +1,13 @@
-import sys
 import logging
+import sys
 from dataclasses import dataclass
 from typing import Optional
+
 
 @dataclass(frozen=True)
 class ScrapingConfig:
     """Configuration for earthquake data scraping."""
+
     base_url: str = "http://www.koeri.boun.edu.tr/scripts/lst4.asp"
     timeout: int = 30
     max_retries: int = 3
@@ -15,9 +17,11 @@ class ScrapingConfig:
         "(KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
     )
 
+
 @dataclass(frozen=True)
 class DataConfig:
     """Configuration for data processing and storage."""
+
     output_dir: str = "data"
     csv_filename: str = "earthquakes.csv"
     json_filename: str = "earthquakes.json"
@@ -26,12 +30,15 @@ class DataConfig:
     datetime_format: str = "%Y-%m-%d %H:%M:%S"
     encoding: str = "utf-8"
 
+
 @dataclass(frozen=True)
 class LoggingConfig:
     """Configuration for logging."""
+
     log_level: str = "INFO"
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     log_file: Optional[str] = "earthquake_scraper.log"
+
 
 # Application configuration instances
 SCRAPING = ScrapingConfig()
@@ -45,28 +52,28 @@ def setup_logging() -> logging.Logger:
     logging.basicConfig(
         level=getattr(logging, LOGGING.log_level),
         format=LOGGING.log_format,
-        handlers=[]  # Clear any existing handlers
+        handlers=[],  # Clear any existing handlers
     )
-    
+
     # Create formatter
     formatter = logging.Formatter(LOGGING.log_format)
-    
+
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
-    
+
     # File handler if specified
     if LOGGING.log_file:
         file_handler = logging.FileHandler(LOGGING.log_file)
         file_handler.setFormatter(formatter)
-    
+
     # Configure root logger with handlers
     root_logger = logging.getLogger()
     root_logger.handlers.clear()  # Remove any existing handlers
     root_logger.addHandler(console_handler)
     if LOGGING.log_file:
         root_logger.addHandler(file_handler)
-    
+
     return root_logger
 
 
