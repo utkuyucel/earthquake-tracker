@@ -1,7 +1,6 @@
 from pathlib import Path
 
-from config import DATA, get_logger, setup_logging
-from earthquake_scraper import EarthquakeScraper, FileFormat
+from src.earthquake_tracker import DATA, EarthquakeScraper, FileFormat, get_logger, setup_logging
 
 
 def main():

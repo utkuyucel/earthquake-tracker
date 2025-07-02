@@ -39,7 +39,7 @@ pip install -e ".[dev]"
 ## Example
 
 ```python
-from earthquake_scraper import EarthquakeScraper, FileFormat
+from src.earthquake_tracker import EarthquakeScraper, FileFormat
 
 scraper = EarthquakeScraper()
 earthquakes = scraper.scrape()

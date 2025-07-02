@@ -11,7 +11,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from config import DATA, SCRAPING, get_logger, setup_logging
+from src.earthquake_tracker.config import DATA, SCRAPING, get_logger, setup_logging
 
 
 class FileFormat(Enum):
