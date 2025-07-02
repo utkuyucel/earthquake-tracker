@@ -28,17 +28,17 @@ jobs:
 
     - name: Run ruff check
       run: |
-        echo "🔍 Running ruff check..."
+        echo "Running ruff check..."
         ruff check .
 
     - name: Run black check
       run: |
-        echo "🔍 Running black check..."
+        echo "Running black check..."
         black --check --diff .
 
     - name: Final ruff check
       run: |
-        echo "🔍 Running final ruff check..."
+        echo "Running final ruff check..."
         ruff check .
 
   test-scraper:
@@ -60,18 +60,18 @@ jobs:
 
     - name: Test import and basic functionality
       run: |
-        echo "🧪 Testing package imports..."
-        python -c "from src.earthquake_tracker import EarthquakeScraper, FileFormat; print('✅ Imports successful')"
+        echo "Testing package imports..."
+        python -c "from src.earthquake_tracker import EarthquakeScraper, FileFormat; print('Imports successful')"
         
-        echo "🧪 Testing scraper instantiation..."
+        echo "Testing scraper instantiation..."
         python -c "
         from src.earthquake_tracker import EarthquakeScraper
         scraper = EarthquakeScraper()
-        print('✅ Scraper instantiation successful')
+        print('Scraper instantiation successful')
         "
 
     - name: Verify package structure
       run: |
-        echo "📁 Checking package structure..."
+        echo "Checking package structure..."
         ls -la src/earthquake_tracker/
-        echo "✅ Package structure verified"
+        echo "Package structure verified"
