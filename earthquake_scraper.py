@@ -1,16 +1,23 @@
-import logging
 import sys
 from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional
+from enum import Enum
 import time
 
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import json
 
-from config import SCRAPING, DATA, LOGGING
+from config import SCRAPING, DATA, setup_logging, get_logger
+
+
+class FileFormat(Enum):
+    """Supported file formats for saving earthquake data."""
+    CSV = "csv"
+    JSON = "json"
 
 
 @dataclass(frozen=True)
@@ -33,7 +40,7 @@ class EarthquakeDataParser:
     """Parse earthquake data from KOERI website text format."""
     
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
+        self.logger = get_logger(__name__)
         
     def parse_magnitude(self, value: str) -> Optional[float]:
         """Parse magnitude value, handling '-.-' as None."""
@@ -106,30 +113,10 @@ class EarthquakeScraper:
     """Scrape earthquake data from KOERI website."""
     
     def __init__(self):
-        self.logger = self._setup_logging()
+        self.logger = get_logger(__name__)
         self.session = self._create_session()
         self.parser = EarthquakeDataParser()
         
-    def _setup_logging(self) -> logging.Logger:
-        """Setup structured logging."""
-        logger = logging.getLogger(__name__)
-        logger.setLevel(getattr(logging, LOGGING.log_level))
-        
-        formatter = logging.Formatter(LOGGING.log_format)
-        
-        # Console handler
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-        
-        # File handler if specified
-        if LOGGING.log_file:
-            file_handler = logging.FileHandler(LOGGING.log_file)
-            file_handler.setFormatter(formatter)
-            logger.addHandler(file_handler)
-            
-        return logger
-    
     def _create_session(self) -> requests.Session:
         """Create HTTP session with proper headers."""
         session = requests.Session()
@@ -268,38 +255,66 @@ class EarthquakeScraper:
         
         filepath = output_path / filename
         
-        import json
         with open(filepath, 'w', encoding=DATA.encoding) as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         
         self.logger.info(f"Saved {len(earthquakes)} records to {filepath}")
     
-    def scrape_and_save(self) -> bool:
-        """Main method to scrape earthquake data and save to files."""
+    def scrape(self) -> Optional[List[EarthquakeData]]:
+        """Scrape earthquake data from KOERI website."""
         self.logger.info("Starting earthquake data scraping")
         
         # Fetch raw data
         html_content = self.fetch_earthquake_data()
         if not html_content:
-            return False
+            return None
             
         # Parse earthquake data
         earthquakes = self.parse_earthquake_data(html_content)
         if not earthquakes:
             self.logger.error("No earthquake data found")
+            return None
+        
+        self.logger.info(f"Successfully scraped {len(earthquakes)} earthquake records")
+        return earthquakes
+    
+    def save(self, earthquakes: List[EarthquakeData], format: FileFormat) -> bool:
+        """Save earthquake data in the specified format."""
+        if not earthquakes:
+            self.logger.warning("No earthquake data to save")
             return False
         
-        # Save to files
-        self.save_to_csv(earthquakes, DATA.csv_filename)
-        self.save_to_json(earthquakes, DATA.json_filename)
+        if format == FileFormat.CSV:
+            self.save_to_csv(earthquakes, DATA.csv_filename)
+            self.logger.info(f"Successfully saved {len(earthquakes)} earthquake records as CSV")
+        elif format == FileFormat.JSON:
+            self.save_to_json(earthquakes, DATA.json_filename)
+            self.logger.info(f"Successfully saved {len(earthquakes)} earthquake records as JSON")
+        else:
+            self.logger.error(f"Unsupported format: {format}")
+            return False
         
-        self.logger.info(f"Successfully scraped and saved {len(earthquakes)} earthquake records")
         return True
+    
+    def scrape_and_save(self, format: FileFormat = FileFormat.CSV) -> bool:
+        """Scrape earthquake data and save in the specified format."""
+        earthquakes = self.scrape()
+        if not earthquakes:
+            return False
+        
+        return self.save(earthquakes, format)
 
 
 def main():
+    setup_logging()
     scraper = EarthquakeScraper()
-    success = scraper.scrape_and_save()
+    
+    earthquakes = scraper.scrape()
+    if not earthquakes:
+        return 1
+    
+    # Save as CSV by default, can be changed to FileFormat.JSON
+    success = scraper.save(earthquakes, FileFormat.CSV)
     return 0 if success else 1
 
 
