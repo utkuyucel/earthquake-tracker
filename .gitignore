@@ -14,3 +14,10 @@ __pycache__/
 
 # logs
 *.log
+
+# environment files
+.env
+
+# egg files
+*.egg
+*.egg-info/
