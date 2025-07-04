@@ -1,13 +1,3 @@
-#!/usr/bin/env python3
-"""
-Complete setup and run script for earthquake tracker.
-This script will:
-1. Start PostgreSQL database
-2. Wait for it to be ready
-3. Run the earthquake scraper
-4. Show database statistics
-"""
-
 import subprocess
 import sys
 import time

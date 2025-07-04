@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Test script for earthquake tracker database functionality.
-"""
-
 import sys
 from datetime import datetime
 

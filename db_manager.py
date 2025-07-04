@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Database management script for earthquake tracker.
-"""
-
 import sys
 from pathlib import Path
 
