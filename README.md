@@ -1,47 +1,43 @@
-# Earthquake Data Scraper
+# Earthquake Data Tracker
 
-Simple Python script to scrape earthquake data from KOERI website and save as CSV or JSON.
+Python earthquake data scraper that fetches data from KOERI and stores it in a PostgreSQL data warehouse with bronze/silver layers.
 
-## Usage
 
-```bash
-python run_scraper.py
-```
 
-## Installation
+## Quick Start
 
 ```bash
-# Install dependencies
+# Prerequisites: Docker, Docker Compose, Python 3.7+
+git clone https://github.com/utkuyucel/earthquake-tracker
+cd earthquake-tracker
 pip install -e .
+cp .env.example .env
 
-# Install with development tools (with linting tools)
-pip install -e ".[dev]"
+# One-command setup and run
+python setup_and_run.py
 ```
 
-## Files
-
-- `config.py` - Configuration settings
-- `scraper.py` - Main scraper code  
-- `run_scraper.py` - Simple runner script
-- `pyproject.toml` - Project configuration and dependencies
-- `data/earthquakes.csv` - Output data
-
-## Development
+## Manual Operations
 
 ```bash
-# Install with dev dependencies
-pip install -e ".[dev]"
-
-# Run linting and formatting
-./lint.sh
+python db_manager.py start    # Start database
+python run_scraper.py         # Run scraper  
+python db_manager.py test     # Check stats
+python db_manager.py stop     # Stop database
 ```
 
-## Example
+## Architecture
 
-```python
-from src.earthquake_tracker import EarthquakeScraper, FileFormat
+- **Bronze Layer**: Raw data with SHA-256 deduplication
+- **Silver Layer**: Latest versions with revision tracking using `magnitude_ml`
 
-scraper = EarthquakeScraper()
-earthquakes = scraper.scrape()
-scraper.save(earthquakes, FileFormat.CSV)  # or FileFormat.JSON
-```
+## Key Files
+
+- `setup_and_run.py` - Complete pipeline
+- `run_scraper.py` - Scraper only
+- `db_manager.py` - Database utilities
+- `src/earthquake_tracker/` - Core package
+
+## Configuration
+
+Edit `src/earthquake_tracker/config.py` and `.env` file for database credentials.
