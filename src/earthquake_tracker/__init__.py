@@ -2,10 +2,11 @@
 Earthquake Tracker - Simple earthquake data scraper for KOERI website.
 """
 
-from .config import DATA, LOGGING, SCRAPING, get_logger, setup_logging
-from .scraper import EarthquakeData, EarthquakeScraper, FileFormat
+from .config import DATA, DATABASE, LOGGING, SCRAPING, get_logger, setup_logging
+from .models import EarthquakeData
+from .scraper import EarthquakeScraper, FileFormat
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
     "EarthquakeScraper",
     "FileFormat",
@@ -13,6 +14,7 @@ __all__ = [
     "SCRAPING",
     "DATA",
     "LOGGING",
+    "DATABASE",
     "setup_logging",
     "get_logger",
 ]

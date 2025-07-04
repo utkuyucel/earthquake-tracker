@@ -1,7 +1,13 @@
 import logging
+import os
 import sys
 from dataclasses import dataclass
 from typing import Optional
+
+from dotenv import load_dotenv
+
+# Load environment variables from .env file for sensitive data
+load_dotenv()
 
 
 @dataclass(frozen=True)
@@ -40,10 +46,28 @@ class LoggingConfig:
     log_file: Optional[str] = "scraper.log"
 
 
+@dataclass(frozen=True)
+class DatabaseConfig:
+    """Configuration for PostgreSQL database connection."""
+
+    host: str = "localhost"
+    port: int = 5432
+    database: str = "earthquake_db"
+    username: str = os.getenv("DB_USERNAME", "postgres")
+    password: str = os.getenv("DB_PASSWORD", "")
+    bronze_schema: str = "bronze"
+    silver_schema: str = "silver"
+    bronze_table: str = "earthquakes"
+    silver_table: str = "earthquakes"
+    connection_timeout: int = 30
+    max_connections: int = 10
+
+
 # Application configuration instances
 SCRAPING = ScrapingConfig()
 DATA = DataConfig()
 LOGGING = LoggingConfig()
+DATABASE = DatabaseConfig()
 
 
 def setup_logging() -> logging.Logger:
