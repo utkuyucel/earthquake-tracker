@@ -1,7 +1,6 @@
 import json
 import sys
 import time
-from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -12,6 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.earthquake_tracker.config import DATA, SCRAPING, get_logger, setup_logging
+from src.earthquake_tracker.models import EarthquakeData
 
 
 class FileFormat(Enum):
@@ -19,23 +19,7 @@ class FileFormat(Enum):
 
     CSV = "csv"
     JSON = "json"
-
-
-@dataclass(frozen=True)
-class EarthquakeData:
-    """Immutable earthquake data structure."""
-
-    date: str
-    time: str
-    latitude: float
-    longitude: float
-    depth: float
-    magnitude_md: Optional[float]
-    magnitude_ml: Optional[float]
-    magnitude_mw: Optional[float]
-    location: str
-    quality: str
-    datetime_utc: datetime
+    DATABASE = "database"
 
 
 class EarthquakeDataParser:
@@ -118,6 +102,7 @@ class EarthquakeScraper:
         self.logger = get_logger(__name__)
         self.session = self._create_session()
         self.parser = EarthquakeDataParser()
+        self.data_warehouse = None  # Initialize on demand
 
     def _create_session(self) -> requests.Session:
         """Create HTTP session with proper headers."""
@@ -267,6 +252,39 @@ class EarthquakeScraper:
 
         self.logger.info(f"Saved {len(earthquakes)} records to {filepath}")
 
+    def save_to_database(self, earthquakes: List[EarthquakeData]) -> bool:
+        """Save earthquake data to PostgreSQL database with bronze and silver layers."""
+        if not earthquakes:
+            self.logger.warning("No earthquake data to save to database")
+            return False
+
+        try:
+            # Initialize data warehouse if not already done (lazy import to avoid circular import)
+            if not self.data_warehouse:
+                from src.earthquake_tracker.database import DataWarehouse
+                self.data_warehouse = DataWarehouse()
+
+            # Ingest data through bronze -> silver pipeline
+            stats = self.data_warehouse.ingest_earthquakes(earthquakes)
+
+            self.logger.info(
+                f"Successfully saved {len(earthquakes)} records to database. "
+                f"Bronze: {stats['bronze']['inserted']} new, "
+                f"{stats['bronze']['duplicates']} duplicates. "
+                f"Silver: {stats['silver']['new']} new, {stats['silver']['updated']} updated."
+            )
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Failed to save earthquake data to database: {e}")
+            return False
+
+    def close_database_connections(self) -> None:
+        """Close database connections."""
+        if self.data_warehouse:
+            self.data_warehouse.close()
+            self.logger.info("Database connections closed")
+
     def scrape(self) -> Optional[List[EarthquakeData]]:
         """Scrape earthquake data from KOERI website."""
         self.logger.info("Starting earthquake data scraping")
@@ -297,6 +315,8 @@ class EarthquakeScraper:
         elif format == FileFormat.JSON:
             self.save_to_json(earthquakes, DATA.json_filename)
             self.logger.info(f"Successfully saved {len(earthquakes)} earthquake records as JSON")
+        elif format == FileFormat.DATABASE:
+            return self.save_to_database(earthquakes)
         else:
             self.logger.error(f"Unsupported format: {format}")
             return False
