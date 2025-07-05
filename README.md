@@ -1,18 +1,17 @@
 # Earthquake Data Tracker
 
-Python earthquake data scraper that fetches data from KOERI and stores it in a PostgreSQL data warehouse with bronze/silver layers.
-
-
+Python earthquake data scraper that fetches data from KOERI and stores it in AWS RDS PostgreSQL with bronze/silver layers.
 
 ## Quick Start
 
 ```bash
-# Prerequisites: Docker, Docker Compose, Python 3.7+
+# Prerequisites: Python 3.7+, AWS RDS PostgreSQL instance
 git clone https://github.com/utkuyucel/earthquake-tracker
 cd earthquake-tracker
 pip install -e .
 cp .env.example .env
 
+# Configure .env with your RDS credentials
 # One-command setup and run
 python setup_and_run.py
 ```
@@ -20,16 +19,15 @@ python setup_and_run.py
 ## Manual Operations
 
 ```bash
-python db_manager.py start    # Start database
-python run_scraper.py         # Run scraper  
-python db_manager.py test     # Check stats
-python db_manager.py stop     # Stop database
+python db_manager.py test     # Test RDS connection and check stats
+python run_scraper.py         # Run scraper only
 ```
 
 ## Architecture
 
 - **Bronze Layer**: Raw data with SHA-256 deduplication
 - **Silver Layer**: Latest versions with revision tracking using `magnitude_ml`
+- **Database**: AWS RDS PostgreSQL with SSL connection
 
 ## Key Files
 
@@ -40,4 +38,11 @@ python db_manager.py stop     # Stop database
 
 ## Configuration
 
-Edit `src/earthquake_tracker/config.py` and `.env` file for database credentials.
+Edit `.env` file with your AWS RDS credentials:
+```env
+DB_HOST=your-rds-endpoint.region.rds.amazonaws.com
+DB_PORT=5432
+DB_NAME=earthquake_db
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+```

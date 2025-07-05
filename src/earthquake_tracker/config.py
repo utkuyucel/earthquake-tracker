@@ -50,16 +50,17 @@ class LoggingConfig:
 class DatabaseConfig:
     """Configuration for PostgreSQL database connection."""
 
-    host: str = "localhost"
-    port: int = 5432
-    database: str = "earthquake_db"
+    host: str = os.getenv("DB_HOST", "localhost")
+    port: int = int(os.getenv("DB_PORT", "5432"))
+    database: str = os.getenv("DB_NAME", "earthquake_db")
     username: str = os.getenv("DB_USERNAME", "postgres")
     password: str = os.getenv("DB_PASSWORD", "")
+    sslmode: str = os.getenv("DB_SSLMODE", "require")
+    connect_timeout: int = int(os.getenv("DB_CONNECT_TIMEOUT", "30"))
     bronze_schema: str = "bronze"
     silver_schema: str = "silver"
     bronze_table: str = "earthquakes"
     silver_table: str = "earthquakes"
-    connection_timeout: int = 30
     max_connections: int = 10
 
 

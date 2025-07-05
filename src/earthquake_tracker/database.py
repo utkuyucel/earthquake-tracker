@@ -67,9 +67,10 @@ class DatabaseManager:
                 database=DATABASE.database,
                 user=DATABASE.username,
                 password=DATABASE.password,
-                connect_timeout=DATABASE.connection_timeout
+                connect_timeout=DATABASE.connect_timeout,
+                sslmode=DATABASE.sslmode
             )
-            self.logger.info("Database connection pool initialized successfully")
+            self.logger.info(f"Database connection pool initialized for: {DATABASE.host}")
         except Exception as e:
             self.logger.error(f"Failed to initialize database connection pool: {e}")
             raise
