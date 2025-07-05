@@ -23,13 +23,13 @@ def test_connection():
         if bronze_records:
             logger.info("Latest bronze records:")
             for record in bronze_records[:3]:
-                magnitude = record.magnitude_ml or record.magnitude_md or 'N/A'
+                magnitude = record.magnitude_ml or record.magnitude_md or "N/A"
                 logger.info(f"  - {record.location} (M{magnitude}) at {record.datetime_utc}")
 
         if silver_records:
             logger.info("Latest silver records:")
             for record in silver_records[:3]:
-                magnitude = record.magnitude_ml or record.magnitude_md or 'N/A'
+                magnitude = record.magnitude_ml or record.magnitude_md or "N/A"
                 logger.info(f"  - {record.location} (M{magnitude}) at {record.datetime_utc}")
 
         dw.close()
